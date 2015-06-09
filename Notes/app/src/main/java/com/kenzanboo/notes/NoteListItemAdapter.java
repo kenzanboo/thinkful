@@ -4,6 +4,7 @@ package com.kenzanboo.notes;
  * Created by kenzanboo on 6/9/15.
  */
 import android.content.Context;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,14 +22,21 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     public NoteListItemAdapter(Context context, RecyclerView recyclerView) {
         this.mContext = context;
         this.mRecyclerView = recyclerView;
-        this.mNoteListItems.add(new NoteListItem("This is your first notepo."));
+        this.mNoteListItems.add(new NoteListItem("This is your first note."));
     }
 
     @Override
-    public NoteListItemAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public NoteListItemAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, final int i) {
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
         View v = LayoutInflater.from(mContext).inflate(R.layout.note_list_item, viewGroup, false);
-        return new ViewHolder(v);
-    }
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NoteListItemAdapter.this.removeItem(i);
+            }
+        });
+        return new ViewHolder(v);    }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
@@ -39,6 +47,15 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     @Override
     public int getItemCount() {
         return mNoteListItems.size();
+    }
+
+    public void addItem(NoteListItem item) {
+        mNoteListItems.add(0, item);
+        notifyItemInserted(0);
+    }
+    public void removeItem(int position) {
+        mNoteListItems.remove(position);
+        notifyItemRemoved(position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
