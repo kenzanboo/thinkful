@@ -6,7 +6,9 @@ package com.kenzanboo.notes;
 import android.content.Context;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -15,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapter.ViewHolder> {
+    static final int MIN_DISTANCE = 150;
+    private float swipex1,swipex2;
+
     private Context mContext;
     private RecyclerView mRecyclerView;
     private ArrayList<NoteListItem> mNoteListItems = new ArrayList<NoteListItem>();
@@ -26,14 +31,17 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     }
 
     @Override
-    public NoteListItemAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, final int i) {
+    public NoteListItemAdapter.ViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         View v = LayoutInflater.from(mContext).inflate(R.layout.note_list_item, viewGroup, false);
-        v.setOnClickListener(new View.OnClickListener() {
+        v.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                NoteListItemAdapter.this.removeItem(i);
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+                if (NoteListItemAdapter.this.detectSwipeRight(motionEvent)) {
+                    NoteListItemAdapter.this.removeItem(viewGroup.indexOfChild(v));
+                }
+                return true;
             }
         });
         return new ViewHolder(v);    }
@@ -56,6 +64,23 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     public void removeItem(int position) {
         mNoteListItems.remove(position);
         notifyItemRemoved(position);
+    }
+
+    /*
+     action_up should be gauranteeed to be prefaced by an action up
+     */
+    private boolean detectSwipeRight(MotionEvent event) {
+        switch(event.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                swipex1 = event.getX();
+                break;
+            case MotionEvent.ACTION_UP:
+                swipex2 = event.getX();
+                float deltaX = swipex2 - swipex1;
+                return (Math.abs(deltaX) > MIN_DISTANCE);
+        }
+        return false;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
