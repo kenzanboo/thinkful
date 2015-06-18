@@ -1,16 +1,28 @@
 package com.kenzanboo.mapper;
 
+import android.graphics.Camera;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LatLng thinkfulLatLng = new LatLng(40.72493, -73.996599);
+    private float defaultZoom = (float) 18.2;
+    private int animateDelay = 3000;
+    private int animateDuration = 3000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +72,32 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        final Marker thinkfulMarker = mMap.addMarker(new MarkerOptions()
+                        .position(thinkfulLatLng)
+                        .title("Thinkful Headquarters")
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.thinkful))
+                        .snippet("On a mission to think thoughtful thoughts")
+        );
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        CameraUpdate thinkfulUpdate = CameraUpdateFactory.newLatLngZoom(thinkfulLatLng, 10);
+        final CameraUpdate zoom = CameraUpdateFactory.zoomTo(defaultZoom);
+        mMap.moveCamera(thinkfulUpdate);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            GoogleMap.CancelableCallback showThinkfulInfo = new GoogleMap.CancelableCallback() {
+                @Override
+                public void onFinish() {
+                    thinkfulMarker.showInfoWindow();
+                }
+                @Override
+                public void onCancel() {}
+            };
+            @Override
+            public void run() {
+                mMap.animateCamera(zoom, animateDuration, showThinkfulInfo);
+            }
+        }, animateDelay);
     }
 }
