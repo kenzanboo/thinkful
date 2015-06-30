@@ -1,10 +1,16 @@
 package com.kenzanboo.mapper;
 
 import android.graphics.Camera;
+import android.location.Location;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,25 +22,86 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
 
-public class MapsActivity extends FragmentActivity {
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.*;
+
+public class MapsActivity extends FragmentActivity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LatLng thinkfulLatLng = new LatLng(40.72493, -73.996599);
     private float defaultZoom = (float) 18.2;
     private int animateDelay = 3000;
     private int animateDuration = 3000;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     @Override
-    protected void onResume() {
+    protected void onPause() {
+        super.onPause();
+        //stop location updates
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+    @Override
+    public void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
+        if (mGoogleApiClient.isConnected()) {
+            setUpMapIfNeeded();    // <-from previous tutorial
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        showLocation(mCurrentLocation);
+        Log.i("Where am I?", "here");
+        startLocationUpdates();
+    }
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
+    @Override
+    public void onLocationChanged(Location location) {
+        showLocation(location);
+    }
+
+
+    protected void showLocation(Location mCurrentLocation) {
+        if (mCurrentLocation != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 15));
+            Log.i("Where am I?", "Latitude: " + mCurrentLocation.getLatitude() + ", Longitude:" + mCurrentLocation.getLongitude());
+        }
+    }
+    protected void startLocationUpdates() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
 
     /**
@@ -72,32 +139,34 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        final Marker thinkfulMarker = mMap.addMarker(new MarkerOptions()
-                        .position(thinkfulLatLng)
-                        .title("Thinkful Headquarters")
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.thinkful))
-                        .snippet("On a mission to think thoughtful thoughts")
-        );
+//        final Marker thinkfulMarker = mMap.addMarker(new MarkerOptions()
+//                        .position(thinkfulLatLng)
+//                        .title("Thinkful Headquarters")
+//                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.thinkful))
+//                        .snippet("On a mission to think thoughtful thoughts")
+//        );
+//
+//        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+//
+//        CameraUpdate thinkfulUpdate = CameraUpdateFactory.newLatLngZoom(thinkfulLatLng, 10);
+//        final CameraUpdate zoom = CameraUpdateFactory.zoomTo(defaultZoom);
+//        mMap.moveCamera(thinkfulUpdate);
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            GoogleMap.CancelableCallback showThinkfulInfo = new GoogleMap.CancelableCallback() {
+//                @Override
+//                public void onFinish() {
+//                    thinkfulMarker.showInfoWindow();
+//                }
+//                @Override
+//                public void onCancel() {}
+//            };
+//            @Override
+//            public void run() {
+//                mMap.animateCamera(zoom, animateDuration, showThinkfulInfo);
+//            }
+//        }, animateDelay);
 
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        CameraUpdate thinkfulUpdate = CameraUpdateFactory.newLatLngZoom(thinkfulLatLng, 10);
-        final CameraUpdate zoom = CameraUpdateFactory.zoomTo(defaultZoom);
-        mMap.moveCamera(thinkfulUpdate);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            GoogleMap.CancelableCallback showThinkfulInfo = new GoogleMap.CancelableCallback() {
-                @Override
-                public void onFinish() {
-                    thinkfulMarker.showInfoWindow();
-                }
-                @Override
-                public void onCancel() {}
-            };
-            @Override
-            public void run() {
-                mMap.animateCamera(zoom, animateDuration, showThinkfulInfo);
-            }
-        }, animateDelay);
+        mMap.setMyLocationEnabled(true);
     }
 }
