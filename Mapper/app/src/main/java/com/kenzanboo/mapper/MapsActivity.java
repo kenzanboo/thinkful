@@ -20,10 +20,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.*;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapsActivity extends FragmentActivity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
@@ -33,6 +35,9 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
     private int animateDelay = 3000;
     private int animateDuration = 3000;
     private GoogleApiClient mGoogleApiClient;
+    protected Location mLastLocation;
+
+    private ArrayList<Location> mMockedLocations = new ArrayList<Location>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,20 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+        Location mockedCurrentLocation = new Location("location");
+        mockedCurrentLocation.setLatitude(37.789045);
+        mockedCurrentLocation.setLongitude(-122.401923);
+        mMockedLocations.add(mockedCurrentLocation);
+
+        Location mockedCurrentLocation1 = new Location("location");
+        mockedCurrentLocation1.setLatitude(37.799045);
+        mockedCurrentLocation1.setLongitude(-122.417923);
+        mMockedLocations.add(mockedCurrentLocation1);
+
+        Location mockedCurrentLocation2 = new Location("location");
+        mockedCurrentLocation2.setLatitude(37.809045);
+        mockedCurrentLocation2.setLongitude(-122.421923);
+        mMockedLocations.add(mockedCurrentLocation2);
     }
 
     @Override
@@ -73,7 +92,6 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
         Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         showLocation(mCurrentLocation);
-        Log.i("Where am I?", "here");
         startLocationUpdates();
     }
     @Override
@@ -84,15 +102,26 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
     }
     @Override
     public void onLocationChanged(Location location) {
-        showLocation(location);
+        if (mMockedLocations.size() > 0) {
+            Location nextLocation  = mMockedLocations.remove(0);
+            showLocation(nextLocation);
+        }
     }
 
 
     protected void showLocation(Location mCurrentLocation) {
+
         if (mCurrentLocation != null) {
+            Log.i("Where am I?", "Latitude: " + mCurrentLocation.getLatitude() + ", Longitude:" + mCurrentLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 15));
-            Log.i("Where am I?", "Latitude: " + mCurrentLocation.getLatitude() + ", Longitude:" + mCurrentLocation.getLongitude());
+            if (mLastLocation !=null) {
+                PolylineOptions polyLineOptions = new PolylineOptions()
+                        .add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+                        .add(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                mMap.addPolyline(polyLineOptions);
+            }
+            mLastLocation = mCurrentLocation;
         }
     }
     protected void startLocationUpdates() {
@@ -100,7 +129,6 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
 
