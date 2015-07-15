@@ -80,7 +80,6 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     private class WebServiceTask extends AsyncTask<String, String, String> {
-
         @Override
         protected String doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
@@ -90,7 +89,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
                 urlConnection = (HttpURLConnection) url.openConnection();
                 useUmbrella(urlConnection.getInputStream());
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e("MainActivity", "Error ", e);
             } finally {
                 if (urlConnection != null) {
@@ -99,37 +98,23 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             }
             return "Umbrella processed";
         }
-        protected void useUmbrella(InputStream in) {
+        protected void useUmbrella(InputStream in) throws Exception {
             StringBuilder stringBuilder = new StringBuilder();
             BufferedReader bufferedReader = null;
-            try {
-                bufferedReader = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line + "\n");
-                }
-                //JSON needs to be parsed here
-                Log.i("Returned data", stringBuilder.toString());
-
-                JSONObject forecastJson = new JSONObject(stringBuilder.toString());
-                JSONArray weatherArray = forecastJson.getJSONArray("list");
-                JSONObject todayForecast = weatherArray.getJSONObject(0);
-
-                city = forecastJson.getJSONObject("city").getString("name");
-                forecast = todayForecast.getJSONArray("weather").getJSONObject(0).getString("main")
-                        + " " + todayForecast.getJSONObject("temp").getString("day") + "°F";
-
-            } catch (Exception e) {
-                Log.e("MainActivity", "Error", e);
-            } finally {
-                if (bufferedReader != null) {
-                    try {
-                        bufferedReader.close();
-                    } catch (final IOException e) {
-                        Log.e("PlaceholderFragment", "Error closing stream", e);
-                    }
-                }
+            bufferedReader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line + "\n");
             }
+            Log.i("Returned data", stringBuilder.toString());
+            JSONObject forecastJson = new JSONObject(stringBuilder.toString());
+            JSONArray weatherArray = forecastJson.getJSONArray("list");
+            JSONObject todayForecast = weatherArray.getJSONObject(0);
+
+            city = forecastJson.getJSONObject("city").getString("name");
+            forecast = todayForecast.getJSONArray("weather").getJSONObject(0).getString("main")
+                    + " " + todayForecast.getJSONObject("temp").getString("day") + "°F";
+            bufferedReader.close();
         }
 
         @Override
