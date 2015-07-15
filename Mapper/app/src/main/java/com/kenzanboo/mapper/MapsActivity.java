@@ -50,20 +50,8 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        Location mockedCurrentLocation = new Location("location");
-        mockedCurrentLocation.setLatitude(37.789045);
-        mockedCurrentLocation.setLongitude(-122.401923);
-        mMockedLocations.add(mockedCurrentLocation);
 
-        Location mockedCurrentLocation1 = new Location("location");
-        mockedCurrentLocation1.setLatitude(37.799045);
-        mockedCurrentLocation1.setLongitude(-122.417923);
-        mMockedLocations.add(mockedCurrentLocation1);
-
-        Location mockedCurrentLocation2 = new Location("location");
-        mockedCurrentLocation2.setLatitude(37.809045);
-        mockedCurrentLocation2.setLongitude(-122.421923);
-        mMockedLocations.add(mockedCurrentLocation2);
+        initializeFakeLocations();
     }
 
     @Override
@@ -196,5 +184,22 @@ public class MapsActivity extends FragmentActivity implements ConnectionCallback
 //        }, animateDelay);
 
         mMap.setMyLocationEnabled(true);
+    }
+
+    private void initializeFakeLocations() {
+        Location mockedCurrentLocation = new Location("location");
+        mockedCurrentLocation.setLatitude(37.789045);
+        mockedCurrentLocation.setLongitude(-122.401923);
+        mMockedLocations.add(mockedCurrentLocation);
+
+        Location mockedCurrentLocation1 = new Location("location");
+        mockedCurrentLocation1.setLatitude(37.799045);
+        mockedCurrentLocation1.setLongitude(-122.417923);
+        mMockedLocations.add(mockedCurrentLocation1);
+
+        Location mockedCurrentLocation2 = new Location("location");
+        mockedCurrentLocation2.setLatitude(37.809045);
+        mockedCurrentLocation2.setLongitude(-122.421923);
+        mMockedLocations.add(mockedCurrentLocation2);
     }
 }
