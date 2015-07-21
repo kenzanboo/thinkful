@@ -1,8 +1,8 @@
 package com.kenzanboo.umbrella;
 
+import android.app.Activity;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -24,7 +23,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 
-public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     protected GoogleApiClient mGoogleApiClient;
     protected String city;
     protected String forecast;
@@ -100,8 +99,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         }
         protected void useUmbrella(InputStream in) throws Exception {
             StringBuilder stringBuilder = new StringBuilder();
-            BufferedReader bufferedReader = null;
-            bufferedReader = new BufferedReader(new InputStreamReader(in));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuilder.append(line + "\n");
