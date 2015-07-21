@@ -2,5 +2,7 @@
     <string name="app_name">NotificationsAndServices</string>
 
     <string name="notify">Notify</string>
+    <string name="setAlarm">Set Alarm</string>
+    <string name="cancelAlarm">Cancel Alarm</string>
     <string name="action_settings">Settings</string>
 </resources>
