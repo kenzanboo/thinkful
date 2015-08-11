@@ -27,7 +27,7 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     public NoteListItemAdapter(Context context, RecyclerView recyclerView) {
         this.mContext = context;
         this.mRecyclerView = recyclerView;
-        this.mNoteListItems.add(new NoteListItem("This is your first note."));
+        this.mNoteListItems.add(new NoteListItem("This is your first note.", null, null));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     }
 
     /*
-     action_up should be gauranteeed to be prefaced by an action up
+     action_up should be gauranteed to be prefaced by an action up
      */
     private boolean detectSwipeRight(MotionEvent event) {
         switch(event.getAction())

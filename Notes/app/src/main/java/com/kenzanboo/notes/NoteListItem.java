@@ -1,13 +1,50 @@
 package com.kenzanboo.notes;
 
-public class NoteListItem {
-    private String text;
+import java.io.Serializable;
+import java.util.Calendar;
 
-    public NoteListItem(String text) {
+public class NoteListItem implements Serializable {
+    private long id;
+    private String text;
+    private String status;
+    private Calendar date;
+
+    public NoteListItem(String text,
+                        String status,
+                        Calendar data) {
         this.text = text;
+        this.status = status;
+        this.date = data;
+    }
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getText() {
-        return this.text;
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Calendar getDate() {
+        return date;
+    }
+
+    public void setDate(Calendar date) {
+        this.date = date;
     }
 }

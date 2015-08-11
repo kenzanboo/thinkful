@@ -12,7 +12,7 @@ import android.os.SystemClock;
  * Created by kenzanboo on 7/21/15.
  */
 public class Alarm {
-    private int ALARM_TIMER = 3;
+    private int ALARM_TIMER = 1;
     protected Context context;
     public Alarm(Context context) {
         this.context = context;
@@ -24,8 +24,8 @@ public class Alarm {
 //                SystemClock.elapsedRealtime() + ALARM_TIMER * 1000,
 //                getMainActivityPendingIntent());
         alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
-                SystemClock.elapsedRealtime() + ALARM_TIMER * 1000,
-                ALARM_TIMER * 1000,
+                SystemClock.elapsedRealtime() + ALARM_TIMER * 10,
+                ALARM_TIMER * 10,
                 getBroadcastActivityPendingIntent());
 
 //        Calendar calendar = Calendar.getInstance();

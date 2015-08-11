@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
  */
 public class Notifier {
     protected Context context;
-    private int notificationID = 100;
+    private static int notificationID = 100;
 
     public Notifier(Context context) {
         this.context = context;
@@ -30,6 +30,7 @@ public class Notifier {
 
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationID = notificationID + 1;
         mNotificationManager.notify(notificationID, nBuilder.build());
 
     }
