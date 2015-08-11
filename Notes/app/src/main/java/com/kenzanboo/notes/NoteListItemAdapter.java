@@ -22,12 +22,15 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
 
     private Context mContext;
     private RecyclerView mRecyclerView;
-    private ArrayList<NoteListItem> mNoteListItems = new ArrayList<NoteListItem>();
+    private List<NoteListItem> mNoteListItems;
+    private NoteDAO dao;
 
     public NoteListItemAdapter(Context context, RecyclerView recyclerView) {
         this.mContext = context;
         this.mRecyclerView = recyclerView;
-        this.mNoteListItems.add(new NoteListItem("This is your first note.", null, null));
+
+        dao = new NoteDAO(context);
+        mNoteListItems = dao.list();
     }
 
     @Override

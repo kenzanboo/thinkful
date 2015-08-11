@@ -13,13 +13,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private NoteListItemAdapter mAdapter;
     private Button mButton;
-    private EditText noteInput;
+    private String ACTIVE = "ACTIVE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,19 +31,26 @@ public class MainActivity extends AppCompatActivity {
 
         NotesDBHelper.getInstance(this).getReadableDatabase();
 
-        noteInput = (EditText) findViewById(R.id.edit_text);
-
         mButton = (Button) findViewById(R.id.button);
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NoteDAO dao = new NoteDAO(MainActivity.this);
+
+                EditText noteInput = (EditText) findViewById(R.id.edit_text);
                 String noteInputText = noteInput.getText().toString();
                 if (noteInputText.length() <= 0) {
                     return;
                 }
-                NoteListItem newNote = new NoteListItem(noteInputText);
+                Calendar date = new GregorianCalendar();
+                NoteListItem newNote = new NoteListItem(noteInputText,ACTIVE, date );
+                dao.save(newNote);
+
                 mAdapter.addItem(newNote);
-                noteInput.setText(null);
+                noteInput.setText("");
+                mLayoutManager.scrollToPosition(0);
+
+
             }
         });
 

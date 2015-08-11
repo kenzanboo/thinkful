@@ -24,15 +24,12 @@ public class NoteDAO {
         this.db = helper.getWritableDatabase();
     }
     public void save(NoteListItem note){
-
-
         ContentValues values = new ContentValues();
         values.put(NotesDBContract.Note.COLUMN_NAME_NOTE_TEXT, note.getText());
         values.put(NotesDBContract.Note.COLUMN_NAME_STATUS, note.getStatus());
         values.put(NotesDBContract.Note.COLUMN_NAME_NOTE_DATE, (note.getDate().getTimeInMillis()/1000));
 
         db.insert(NotesDBContract.Note.TABLE_NAME, null, values);
-
     }
 
     public List<NoteListItem> list() {
