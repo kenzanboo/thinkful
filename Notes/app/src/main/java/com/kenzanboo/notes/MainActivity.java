@@ -1,8 +1,13 @@
 package com.kenzanboo.notes;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private NoteListItemAdapter mAdapter;
     private Button mButton;
-    private String ACTIVE = "ACTIVE";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(toolbar);
+
+        SharedPreferences activityPrefs = getPreferences(Context.MODE_PRIVATE);
+        // SharedPreferences sharedPrefsContext = PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences sharedPrefsApp = getPreferences("my_app", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = activityPrefs.edit();
     }
 
     @Override
@@ -91,14 +103,33 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    getApplicationContext().getString(R.string.hello_world),
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            openColorDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void openColorDialog(){
+        final EditText input = new EditText(this);
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.setting_color_title)
+                .setMessage(R.string.setting_color_message)
+                .setView(input)
+                .setPositiveButton(R.string.positive_button_label, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = input.getText().toString();
+                        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("NOTE_COLOR", value);
+                        editor.commit();
+                    }
+                }).setNegativeButton(R.string.negative_button_label, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+            }
+        }).show();
+    }
 
 }
