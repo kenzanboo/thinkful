@@ -56,6 +56,14 @@ public class NoteDAO {
                 selectionArgs);
     }
 
+    public void delete(NoteListItem noteListItem) {
+        String selection = NotesDBContract.Note.COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(noteListItem.getId()) };
+
+        db.delete(NotesDBContract.Note.TABLE_NAME, selection, selectionArgs);
+
+    }
+
 
 
     public List<NoteListItem> list() {

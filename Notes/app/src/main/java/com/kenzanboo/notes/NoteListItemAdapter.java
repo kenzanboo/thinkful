@@ -58,6 +58,15 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
                 return true;
             }
         });
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NoteListItem noteListItem = mNoteListItems.get(mRecyclerView.getChildPosition(v));
+                dao.delete(noteListItem);
+                Toast.makeText(mContext, "Deleted: " + noteListItem.getText(), Toast.LENGTH_LONG).show();
+                removeItem(mRecyclerView.getChildPosition(v));
+            }
+        });
 //        v.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent motionEvent) {
