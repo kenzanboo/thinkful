@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,16 +28,42 @@ public class NoteDAO {
         ContentValues values = new ContentValues();
         values.put(NotesDBContract.Note.COLUMN_NAME_NOTE_TEXT, note.getText());
         values.put(NotesDBContract.Note.COLUMN_NAME_STATUS, note.getStatus());
-        values.put(NotesDBContract.Note.COLUMN_NAME_NOTE_DATE, (note.getDate().getTimeInMillis()/1000));
-
-        db.insert(NotesDBContract.Note.TABLE_NAME, null, values);
+        values.put(NotesDBContract.Note.COLUMN_NAME_NOTE_DATE, (note.getDate().getTimeInMillis() / 1000));
+        Long noteId = note.getId();
+        if (noteId != null) {
+            String selection = NotesDBContract.Note.COLUMN_NAME_ID + " = ?";
+            String[] selectionArgs = { String.valueOf(note.getId()) };
+            db.update(NotesDBContract.Note.TABLE_NAME, values, selection, selectionArgs);
+        } else {
+            db.insert(NotesDBContract.Note.TABLE_NAME, null, values);
+        }
     }
+
+    public void update(NoteListItem noteListItem){
+        NotesDBHelper helper = NotesDBHelper.getInstance(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(NotesDBContract.Note.COLUMN_NAME_NOTE_TEXT, noteListItem.getText());
+
+        String selection = NotesDBContract.Note.COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(noteListItem.getId()) };
+
+        int count = db.update(
+                NotesDBContract.Note.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+    }
+
+
 
     public List<NoteListItem> list() {
         String[] projection = {
                 NotesDBContract.Note.COLUMN_NAME_NOTE_TEXT,
                 NotesDBContract.Note.COLUMN_NAME_STATUS,
-                NotesDBContract.Note.COLUMN_NAME_NOTE_DATE
+                NotesDBContract.Note.COLUMN_NAME_NOTE_DATE,
+                NotesDBContract.Note.COLUMN_NAME_ID
         };
         String sortOrder = NotesDBContract.Note.COLUMN_NAME_NOTE_DATE + " DESC";
 
@@ -53,6 +80,8 @@ public class NoteDAO {
         List<NoteListItem> notes = new ArrayList<NoteListItem>();
 
         while(c.moveToNext()){
+            Long id = c.getLong(
+                    c.getColumnIndex(NotesDBContract.Note.COLUMN_NAME_ID));
             String text = c.getString(
                     c.getColumnIndex(NotesDBContract.Note.COLUMN_NAME_NOTE_TEXT));
             String status = c.getString(c.getColumnIndex(
@@ -60,9 +89,9 @@ public class NoteDAO {
             Calendar date = new GregorianCalendar();
             date.setTimeInMillis(c.getLong(c.getColumnIndex(
                     NotesDBContract.Note.COLUMN_NAME_NOTE_DATE)) * 1000);
-            notes.add(new NoteListItem(text, status, date));
+            notes.add(new NoteListItem(id, text, status, date));
         }
-
+        Log.i("NOTES", notes.size() + " notes loaded");
         return notes;
 
     }

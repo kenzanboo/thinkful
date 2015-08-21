@@ -22,6 +22,7 @@ public class NotesDBContract {
         public static final String COLUMN_NAME_NOTE_TEXT = "note_text";
         public static final String COLUMN_NAME_STATUS = "status";
         public static final String COLUMN_NAME_NOTE_DATE = "note_date";
+        public static final String COLUMN_NAME_ID = "rowid";
     }
 
     /* Inner class that defines the tag table */

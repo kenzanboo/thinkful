@@ -1,6 +1,7 @@
 package com.kenzanboo.notes;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,15 +43,12 @@ public class MainActivity extends AppCompatActivity {
                 if (noteInputText.length() <= 0) {
                     return;
                 }
-                Calendar date = new GregorianCalendar();
-                NoteListItem newNote = new NoteListItem(noteInputText,ACTIVE, date );
+                NoteListItem newNote = new NoteListItem(noteInputText);
                 dao.save(newNote);
 
                 mAdapter.addItem(newNote);
                 noteInput.setText("");
                 mLayoutManager.scrollToPosition(0);
-
-
             }
         });
 
@@ -63,8 +61,18 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(toolbar);
+    }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == 1) {
+            if (data.hasExtra("Note")) {
+                NoteListItem note = (NoteListItem)data.getSerializableExtra("Note");
+                Toast.makeText(this, note.getText(),
+                        Toast.LENGTH_LONG).show();
+                mAdapter.addItem(note);
+            }
+        }
     }
 
     @Override

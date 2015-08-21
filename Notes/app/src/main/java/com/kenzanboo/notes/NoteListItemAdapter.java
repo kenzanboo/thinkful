@@ -3,7 +3,9 @@ package com.kenzanboo.notes;
 /**
  * Created by kenzanboo on 6/9/15.
  */
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.DragEvent;
@@ -12,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,23 +35,62 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
         dao = new NoteDAO(context);
         mNoteListItems = dao.list();
     }
+    public NoteListItemAdapter updateNoteList() {
+        mNoteListItems = dao.list();
+        return this;
+    }
 
     @Override
     public NoteListItemAdapter.ViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         View v = LayoutInflater.from(mContext).inflate(R.layout.note_list_item, viewGroup, false);
-        v.setOnTouchListener(new View.OnTouchListener() {
+        v.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-                if (NoteListItemAdapter.this.detectSwipeRight(motionEvent)) {
-                    NoteListItemAdapter.this.removeItem(viewGroup.indexOfChild(v));
-                }
+            public boolean onLongClick(View v){
+                NoteListItem noteListItem = mNoteListItems.get(mRecyclerView.getChildPosition(v));
+                removeItem(mRecyclerView.getChildPosition(v));
+                Intent intent = new Intent(mContext, EditNoteActivity.class);
+                intent.putExtra("Note", noteListItem);
+
+                ((Activity)mContext).startActivityForResult(intent, 1);
+
                 return true;
             }
         });
-        return new ViewHolder(v);    }
+//        v.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent motionEvent) {
+//                if (NoteListItemAdapter.this.detectSwipeRight(motionEvent)) {
+//                    NoteListItemAdapter.this.removeItem(viewGroup.indexOfChild(v));
+//                }
+//                return true;
+//            }
+//        });
 
+        return new ViewHolder(v);
+    }
+    /*
+    public void editItem(NoteListItem note) {
+        Intent intent = new Intent(mContext, EditNoteActivity.class);
+        intent.putExtra("Note", note);
+        Activity activity = (Activity) mContext;
+        activity.startActivity(intent);
+    }
+    */
+    /*
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == 1) {
+            if (data.hasExtra("Note")) {
+                NoteListItem note = (NoteListItem)data.getSerializableExtra("Note");
+                Toast.makeText(this, note.getText(),
+                        Toast.LENGTH_LONG).show();
+                mAdapter.addItem(note);
+            }
+        }
+    }
+    */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         NoteListItem noteListItem = mNoteListItems.get(i);
